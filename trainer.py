@@ -69,8 +69,8 @@ class Trainer:
             except StopIteration:
                 data_iter = iter(train_loader)
                 batch = next(data_iter)
-            batch = [t.to(self.device) for t in batch]
-            x, y = batch
+            batch = [t.to(self.device).long() for t in batch]
+            x, y = batch            
 
             # forward the model
             logits, self.loss = model(x, y)
