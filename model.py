@@ -16,12 +16,11 @@ def heaviside_activation(x):
 
 def zero_one_score(logits, targets):
     predictions = torch.argmax(logits, axis=1)
-    return (targets == predictions).sum()
+    return ((targets == predictions).sum()).type('torch.DoubleTensor')
 
 
 def default_loss_fn(logits, targets):
-    return zero_one_score(logits, targets)
-
+    return torch.autograd.Variable(zero_one_score(logits, targets), requires_grad=True)
 
 class Feedforward(nn.Module):
     """
@@ -96,16 +95,15 @@ class Feedforward(nn.Module):
         tok_emb = self.wte(idx)
         # Flatten embeddings in preparation of the fully-connected layers
         x = tok_emb.reshape(b, -1)
-
         x = self.fnn1(x)
         x = heaviside_activation(x)
         x = self.fnn2(x)
-
         loss = None
         if targets is not None:
             # The fully connected layer predicts only the last character
             targets = targets[:, -1]
             loss = loss_fn(x, targets)
+
 
         # Reshape output to be consistent with the rest of the training framework
         return x.reshape(b, 1, -1), loss
