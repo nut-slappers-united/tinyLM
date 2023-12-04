@@ -41,8 +41,9 @@ class Feedforward(nn.Module):
         super().__init__()
         self.wte = nn.Embedding(config.vocab_size, config.n_embd)
         self.fnn1 = nn.Linear(config.block_size * config.n_embd, config.hidden_dim)
-        self.fnn2 = nn.Linear(config.hidden_dim, config.vocab_size, bias=False)
+        self.fnn2 = nn.Linear(config.hidden_dim, config.block_size * config.vocab_size, bias=False)
         self.block_size = config.block_size
+        self.vocab_size = config.vocab_size
 
     def configure_optimizers(self, train_config):
         """
@@ -88,25 +89,37 @@ class Feedforward(nn.Module):
         optimizer = torch.optim.AdamW(optim_groups, lr=train_config.learning_rate, betas=train_config.betas)
         return optimizer
 
-    def forward(self, idx, targets=None, loss_fn=default_loss_fn):
+    def forward(self, idx, targets=None, loss_fn=None):
         b, t = idx.size()
         assert t <= self.block_size, f"Cannot forward sequence of length {t}, block size is only {self.block_size}"
-
+        # print("batch: ", b, "block_size: ", t)
+        # if targets is None:
+        #     print(idx)
         tok_emb = self.wte(idx)
+        # print("tok_emb: ", tok_emb.shape)
         # Flatten embeddings in preparation of the fully-connected layers
         x = tok_emb.reshape(b, -1)
+        # print(x.shape)
         x = self.fnn1(x)
+        # print("fnn1: ", x.shape)
         x = heaviside_activation(x)
         x = self.fnn2(x)
+        # print("fnn2: ", x.shape)
+        x = x.reshape(b, self.block_size, self.vocab_size)
+        # print("logits: ", x.shape)
         loss = None
+        
         if targets is not None:
+            # print("target: ", targets.shape)
             # The fully connected layer predicts only the last character
-            targets = targets[:, -1]
-            loss = loss_fn(x, targets)
+            # targets = targets[:, -1]
+            # loss = loss_fn(x, targets)
+            loss = F.cross_entropy(x.view(-1, x.size(-1)), targets.view(-1), ignore_index=-1)
 
 
         # Reshape output to be consistent with the rest of the training framework
-        return x.reshape(b, 1, -1), loss
+        # return x.reshape(b, 1, -1), loss
+        return x, loss
     
     @torch.no_grad()
     def generate(self, idx, max_new_tokens, temperature=1.0, do_sample=False, top_k=None):

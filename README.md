@@ -19,3 +19,16 @@ This is the repo for the MLC Machine Learning Engineer (NLP) Task, which involve
 
 ## Refs:
 Codebase adapted from minGPT: https://github.com/karpathy/minGPT/
+
+## Training
+* For training the `Feedforward` model (default) - `python main.py`
+* For training the  `GPT` (gpt-nano)  model - `python main.py -m gpt`
+
+
+## Additional Config Parameters:
+
+Following new hyperparameters are added in the training configuration for GPT  model training (`get_gpt_config`) and given Feedforward model training (`get_ff_config`):
+
+  * `C.trainer.patience` - *Number of interations to wait before validation training does not show improvement and training stops*
+  * `C.trainer.validation_interval` - *Number of steps after which we run validation*
+  * `C.trainer.min_relative_improvement` - *Threshold for relative improvement in validation loss, such that we consider an improvement in validation loss. Here 5% improvement is set in decimals as 0.05*
