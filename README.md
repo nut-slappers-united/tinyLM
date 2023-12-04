@@ -20,6 +20,33 @@ This is the repo for the MLC Machine Learning Engineer (NLP) Task, which involve
 ## Refs:
 Codebase adapted from minGPT: https://github.com/karpathy/minGPT/
 
+## Task Description
+
+Your task is to make the highest-quality language model you can. You are provided with an
+initial (faulty) attempt at a pipeline intended to train a neural network architecture to do
+self-supervised character-level language modelling. The provided model is a fully-connected
+2-layer neural network with a custom Heaviside activation function, which is set up to be trained
+using a 0-1 loss, with 10 characters as input and the subsequent one as the target.
+Here is the recommended way to approach this task:
+
+- Understand the relevant bits of the codebase and identify key issues with the current
+training pipeline (15 minutes)
+- Come up with a plan on how to improve on the provided architecture and pipeline (15
+minutes)
+- Execute the planned changes (2 hours)
+- Write up a report of implementation, findings, and further ideas. Make sure to describe
+the trade-offs of the architectural decisions you made. (30 minutes) :white_check_mark:
+
+Bonus points (if you have time):
+- A colleague suggests using word embeddings instead of doing character-level
+modelling. Describe the trade-offs that change offers. Suggest any alternatives that
+come to mind. :white_check_mark:
+- The chosen accuracy measure doesn’t provide a good understanding of model
+performance. Suggest an alternative measure for model quality and describe the
+tradeoff. :white_check_mark:
+- The model is currently trained for a set, arbitrary number of iterations. Implement a more
+informed stopping criterion. :white_check_mark:
+
 ## Initial Code with 0-1 Loss
 The initial pipeline with fixed code can be found in branch: `init_debugging`
 
